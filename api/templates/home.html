@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% block title %}Home | Chuk Umunna{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <h2>Summary</h2>
+  <p><i>
+    Dedicated data steward with experience in delivering good data management and data governance. 
+    Results-driven data professional passionate about leveraging data to drive impactful solutions. 
+    Expert at optimising data quality, automating master data management systems, and implementing robust data governance frameworks. 
+    Committed to maintaining high standards of quality, consistency, and efficiency in Data Strategy.
+  </i></p>
+  <a href="{{ url_for('portfolio') }}" class="btn">View My Work</a>
+</section>
+
+<!-- SKILLS -->
+<section>
+  <h2>Skills</h2>
+
+  <style>
+    .skills-list {
+      columns: 3;
+      -webkit-columns: 3;
+      -moz-columns: 3;
+      list-style-type: disc;
+      padding-left: 20px;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 900px) {
+      .skills-list {
+        columns: 2;
+        -webkit-columns: 2;
+        -moz-columns: 2;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .skills-list {
+        columns: 1;
+        -webkit-columns: 1;
+        -moz-columns: 1;
+      }
+    }
+
+    section {
+      margin-bottom: 2.5rem;
+    }
+
+    h2 {
+      color: #1f2937;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 0.3rem;
+    }
+
+    h3 {
+      color: #2c3e50;
+      margin-top: 1.5rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .organisation {
+      font-style: italic;
+      color: #666;
+    }
+
+    .period {
+      display: block;
+      color: #999;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+
+    ul.responsibilities {
+      list-style-type: disc;
+      padding-left: 20px;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+    }
+  </style>
+
+  <ul class="skills-list">
+    <li>Data Quality Assessment</li>
+    <li>Data Management Planning</li>
+    <li>Problem Solving</li>
+    <li>Data Maturity Assessment</li>
+    <li>Communication</li>
+    <li>Database Management</li>
+    <li>Data Privacy</li>
+    <li>Analytical Skills</li>
+    <li>Data Stewardship</li>
+    <li>Programming</li>
+  </ul>
+</section>
+
+<!-- PROFESSIONAL EXPERIENCE -->
+<section>
+  <h2>Professional Experience</h2>
+
+  <h3>Project Data Steward & Data Verification Specialist</h3>
+  <div class="organisation">National Environment Research Council (NERC) / National Geoscience Data Centre (NGDC)</div>
+  <span class="period">June 2023 – Present</span>
+  <ul class="responsibilities">
+    <li>Manage a portfolio of research projects, collaborating with Principal Investigators to design and review Data Management Plans (DMPs).</li>
+    <li>Verify structiral elements, completeness, and compliance of submitted research data and metadata before ingestion.</li>
+    <li>Use tools such as DataMad, Jira, and DS Wizard for workflow coordination and systematic data validation.</li>
+    <li>Contribute to improving internal data governance processes and maintaining high curation standards.</li>
+  </ul>
+
+  <h3>Data Quality and Metadata Specialist</h3>
+  <div class="organisation">British Geological Survey (BGS)</div>
+  <span class="period">April 2024 – Present</span>
+  <ul class="responsibilities">
+    <li>Conduct data quality assurance, metadata reviews, and content validation to ensure alignment with policies and standards.</li>
+    <li>Create discovery metadata records supporting visibility and accessibility to data.</li>
+    <li>Apply standards such as ISO 19115, GEMINI, and FAIR principles for data interoperability.</li>
+    <li>Collaborate across teams to standardise and document datasets for improved traceability and governance.</li>
+  </ul>
+
+  <h3>Geoscience Data Steward</h3>
+  <div class="organisation">British Geological Survey (BGS)</div>
+  <span class="period">November 2023 – Present</span>
+  <ul class="responsibilities">
+    <li>Support data management operations, database administration, and data migration for geoscientific datasets.</li>
+    <li>Support metadata creation and harmonisation for hydrogeological and geophysical data management.</li>
+    <li>Implement quality assurance processes to enhance reliability and usability of scientific data.</li>
+  </ul>
+
+  <h3>Data Maturity Assessment Assistant</h3>
+  <div class="organisation">British Geological Survey (BGS)</div>
+  <span class="period">October 2024 – January 2025</span>
+  <ul class="responsibilities">
+    <li>Assist in organisation-wide data maturity assessments and contribute to governance framework development.</li>
+    <li>Analyse assessment data and prepare reports highlighting strengths, weaknesses, and opportunities for improvement.</li>
+    <li>Support documentation of data workflows and governance practices for transparency and learning.</li>
+  </ul>
+
+  <h3>GIS Consultant</h3>
+  <div class="organisation">Heeley Trust Organisation, Sheffield</div>
+  <span class="period">June 2023 – January 2025</span>
+  <ul class="responsibilities">
+    <li>Performed quality control on geospatial data and metadata to ensure accuracy and consistency.</li>
+    <li>Created and maintained geodatabases using ArcGIS Online and conducted spatial analyses using ArcGIS Pro, QGIS, and Python.</li>
+    <li>Developed metadata documentation and provided GIS training to staff and volunteers.</li>
+  </ul>
+</section>
+
+<!-- EDUCATION -->
+<section>
+  <h2>Education</h2>
+
+  <p><strong>Sheffield Hallam University</strong><br>
+  Master of Science in Geographical Information Systems (2:1 Honours)<br>
+  <span class="period">September 2021 – January 2023</span></p>
+
+  <p><strong>Federal University of Technology Akure</strong><br>
+  Bachelor of Technology in Applied Geology (2:1 Honours)<br>
+  <span class="period">September 2012 – March 2018</span></p>
+
+  <p><em>References available upon request.</em></p>
+</section>
+
+{% endblock %}

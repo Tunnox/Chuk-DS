@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}CLEAR Metadata Framework | Chuk Umunna{% endblock %}
+
+{% block content %}
+<style>
+  .clear-container {
+    max-width: 900px;
+    margin: auto;
+    padding: 25px;
+    font-family: "Inter", sans-serif;
+    line-height: 1.7;
+  }
+
+  h2,
+  h3 {
+    font-weight: 700;
+    margin-top: 25px;
+  }
+
+  .checklist-section {
+    background: #f9fafb;
+    border-radius: 14px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  }
+
+  .question {
+    margin-bottom: 12px;
+  }
+
+  .btn-grade {
+    background: #2563eb;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    margin-top: 12px;
+  }
+
+  .result-box {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 10px;
+    display: none;
+    font-weight: 600;
+  }
+
+  .good {
+    background: #dcfce7;
+    color: #166534;
+  }
+
+  .improve {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+</style>
+
+<div class="clear-container">
+  <h2>CLEAR Metadata Framework</h2>
+  <h3>Developed by Chukwuemeka Oluwaseun Umunna, August 2025</h3>
+  <p>The CLEAR Framework helps ensure your metadata is clear, complete, discoverable, and aligned with generally
+    accepted guidance.
+    Use the guidance below and complete the quick questionnaire to assess the quality of your metadata.</p>
+
+  <h3>CLEAR Guidance Summary</h3>
+  <ul>
+    <li><strong>C – Clarity:</strong> Plain English, understandable, avoids unexplained jargon, describes the dataset
+      not the project.</li>
+    <li><strong>L – Length & Focus:</strong> Titles ≤ 60 characters; abstracts ≥ 100 characters, with the first 150
+      summarising key info.</li>
+    <li><strong>E – Essential Information:</strong> Include <strong>What, Where, When (title) + What, Where, When, How,
+        Why, Who</strong>
+      (abstract).</li>
+    <li><strong>A – Accuracy:</strong> No repeated text, correct acronym formatting, accurate dataset description.</li>
+    <li><strong>R – Readability:</strong> Sentence case, natural writing, enough context to judge relevance.</li>
+  </ul>
+
+  <h3>Quick CLEAR Questionnaire</h3>
+  <div class="checklist-section">
+    <form id="clearForm">
+      <div class="question"><label>1. Is the title understandable to a non-expert? <br><input type="checkbox"
+            name="q"></label></div>
+      <div class="question"><label>2. Does the title include What, Where, When? <br><input type="checkbox"
+            name="q"></label></div>
+      <div class="question"><label>3. Is the abstract at least 100 characters? <br><input type="checkbox"
+            name="q"></label></div>
+      <div class="question"><label>4. Are all acronyms explained? <br><input type="checkbox" name="q"></label></div>
+      <div class="question"><label>5. Does the abstract include 5Ws + H? <br><input type="checkbox" name="q"></label>
+      </div>
+      <div class="question"><label>6. Is the writing clear, accurate, and non‑repetitive? <br><input type="checkbox"
+            name="q"></label></div>
+      <button type="button" class="btn-grade" onclick="gradeMetadata()">Check Metadata Quality</button>
+    </form>
+
+    <div id="result" class="result-box"></div>
+  </div>
+
+  <p style="margin-top:25px;">Return to <a href="{{ url_for('portfolio') }}">Portfolio</a></p>
+</div>
+
+<script>
+  function gradeMetadata() {
+    const checks = document.querySelectorAll('input[name="q"]');
+    let score = 0;
+    checks.forEach(c => { if (c.checked) score++; });
+    const result = document.getElementById('result');
+
+    if (score >= 5) {
+      result.textContent = "Good Metadata Achieved — Your metadata strongly aligns with the CLEAR framework.";
+      result.className = "result-box good";
+    } else {
+      result.textContent = "Metadata could benefit from improvement — Review the CLEAR checklist to strengthen clarity and completeness.";
+      result.className = "result-box improve";
+    }
+    result.style.display = "block";
+  }
+</script>
+
+{% endblock %}

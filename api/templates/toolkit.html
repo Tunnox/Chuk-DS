@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CDMA Tools Dashboard</title>
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-somehash" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Bootstrap (kept for JS tab functionality) -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+
+  <style>
+    :root{
+      --bg: #f6f8fa;
+      --panel: #ffffff;
+      --muted: #6b7280;
+      --brand: #0f766e; /* teal */
+      --brand-dark: #064e45;
+      --accent: #06b6d4;
+      --glass: rgba(255,255,255,0.6);
+      --shadow: 0 8px 24px rgba(12, 20, 26, 0.08);
+    }
+    [data-theme="dark"]{
+      --bg: #071019;
+      --panel: #0b1820;
+      --muted: #9aa6ad;
+      --brand: #1dd3c5;
+      --brand-dark: #06383a;
+      --accent: #2dd4bf;
+      --glass: rgba(255,255,255,0.03);
+      --shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;padding:0;font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+    body{
+      background: linear-gradient(180deg, var(--bg), rgba(255,255,255,0.01));
+      color: #0b1a1e;
+      transition: background 240ms ease, color 240ms ease;
+      min-height:100vh;
+      overflow: hidden;
+    }
+    [data-theme="dark"] body{color: #dbeefe}
+
+    /* Top header */
+    .topbar {
+      height:64px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:0 20px;
+      position:fixed;
+      left:0; right:0; top:0;
+      z-index:1200;
+      background: linear-gradient(90deg, var(--panel), transparent);
+      border-bottom:1px solid rgba(15,15,15,0.04);
+      backdrop-filter: blur(6px);
+    }
+    .brand {
+      display:flex; gap:14px; align-items:center;
+    }
+    .brand .logo {
+      width:40px; height:40px; border-radius:8px;
+      background: linear-gradient(135deg, var(--brand), var(--accent));
+      display:flex; align-items:center; justify-content:center; color:white; font-weight:700;
+      box-shadow: var(--shadow);
+    }
+    .brand h1{font-size:16px;margin:0;font-weight:700;color:var(--brand-dark)}
+    .top-actions { display:flex; gap:12px; align-items:center; }
+
+    .search-input {
+      min-width:220px;
+      max-width:420px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      background:var(--panel);
+      padding:8px 12px;
+      border-radius:10px;
+      box-shadow: var(--shadow);
+    }
+    .search-input input { border:0; outline:none; background:transparent; width:180px; color:inherit; }
+
+    .profile {
+      display:flex; gap:10px; align-items:center;
+    }
+    .profile img{width:36px;height:36px;border-radius:8px}
+    .theme-toggle {
+      background: transparent;
+      border: 1px solid rgba(0,0,0,0.06);
+      padding:8px 10px;
+      border-radius:8px;
+      cursor:pointer;
+      display:flex; gap:8px; align-items:center;
+    }
+    .theme-toggle:hover{transform:translateY(-1px)}
+
+    /* Layout: sidebar + content */
+    .app {
+      display:flex;
+      height:100vh;
+      padding-top:64px; /* header */
+      overflow:hidden;
+    }
+    .sidebar {
+      width:220px;
+      background: linear-gradient(180deg, var(--panel), var(--glass));
+      border-right:1px solid rgba(0,0,0,0.04);
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      transition: width 220ms ease;
+      min-height: calc(100vh - 64px);
+      overflow:auto;
+    }
+    .sidebar.collapsed { width:74px; }
+    .sidebar .nav-primary { display:flex; flex-direction:column; gap:6px; }
+    .nav-btn {
+      display:flex; gap:10px; align-items:center;
+      padding:10px 12px; border-radius:10px; background:transparent; border:none; color:inherit;
+      text-align:left; cursor:pointer; font-weight:600;
+    }
+    .nav-btn:hover{background:linear-gradient(90deg, rgba(6,182,212,0.06), rgba(15,118,110,0.03)); transform:translateY(-1px)}
+    .nav-btn i{width:18px; text-align:center}
+    .nav-btn.active{ background: linear-gradient(90deg, rgba(6,182,212,0.12), rgba(15,118,110,0.05)); box-shadow:var(--shadow); }
+
+    .secondary-sidebar {
+      width:220px;
+      background:transparent;
+      border-left:1px solid rgba(0,0,0,0.03);
+      padding:12px;
+      overflow:auto;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+
+    .main {
+      flex:1;
+      padding:28px;
+      overflow:auto;
+      height: calc(100vh - 64px);
+    }
+
+    /* Cards and forms */
+    .card-modern {
+      background:var(--panel);
+      border-radius:12px;
+      padding:18px;
+      box-shadow: var(--shadow);
+      margin-bottom:18px;
+      border:1px solid rgba(0,0,0,0.03);
+    }
+    h2 { color: var(--brand-dark); margin-bottom:8px; }
+    label { font-weight:600; color:var(--muted); }
+
+    input[type="text"], textarea, input[type="number"], input[type="file"], select, input[type="date"], input[type="datetime-local"] {
+      width:100%;
+      padding:10px 12px;
+      margin:6px 0 12px 0;
+      border-radius:8px;
+      border:1px solid rgba(15,15,15,0.06);
+      background: linear-gradient(180deg, transparent, transparent);
+    }
+    button.btn-modern {
+      padding:10px 14px;
+      border-radius:10px;
+      border:0;
+      font-weight:700;
+      cursor:pointer;
+      background: linear-gradient(90deg, var(--brand), var(--accent));
+      color:white;
+      box-shadow: 0 8px 18px rgba(6,118,110,0.12);
+    }
+    button.btn-outline {
+      background:transparent;
+      border:1px solid rgba(15,15,15,0.06);
+      color: inherit;
+      padding:8px 12px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:600;
+    }
+    .muted { color:var(--muted); font-size:13px }
+
+    /* Tabbed dashboard styles */
+    .nav-tabs .nav-link { border:0; color:var(--muted); font-weight:700; }
+    .nav-tabs .nav-link.active { color:var(--brand-dark); border-bottom:3px solid var(--brand)!important; }
+
+    /* Task / Issue list styles */
+    .task-card { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px; border-radius:10px; border:1px solid rgba(0,0,0,0.03); background:linear-gradient(180deg, rgba(255,255,255,0.3), transparent) }
+    .task-card .meta { color:var(--muted); font-size:13px }
+    .badge-status { padding:6px 10px; border-radius:999px; font-weight:700; font-size:12px; }
+
+    /* tables */
+    table { width:100%; border-collapse:collapse; margin-top:8px; }
+    table th, table td { padding:10px; border-bottom:1px solid rgba(0,0,0,0.04); text-align:left; font-size:14px }
+    table thead th{ font-weight:700; color:var(--muted); background:transparent }
+
+    /* responsive */
+    @media (max-width:1000px){
+      .secondary-sidebar{ display:none }
+      .sidebar{ position:fixed; z-index:1300; left:0; top:64px; bottom:0; transform:translateX(0); }
+      .main{ padding:18px }
+    }
+
+    /* small niceties */
+    .footer {
+      padding:14px; text-align:center; color:var(--muted); font-size:13px;
+      border-top:1px solid rgba(0,0,0,0.03);
+      background:transparent;
+    }
+    .small-muted{ font-size:13px; color:var(--muted) }
+
+    /* file drop zone styles (path-generator) */
+    #drop-zone {
+      border: 1px dashed rgba(15,15,15,0.06);
+      padding:18px;
+      border-radius:10px;
+      text-align:center;
+      background: linear-gradient(180deg, rgba(255,255,255,0.6), transparent);
+    }
+    #drop-zone.dragover { border-color: var(--brand); box-shadow:0 6px 18px rgba(6,182,212,0.06); transform:translateY(-2px) }
+    .bbox-container .bbox-item { padding:12px; border-radius:10px; color:white; font-weight:700 }
+
+    /* subtle transitions */
+    .card-modern, .nav-btn, input, button { transition: all 160ms ease; }
+    .hidden { display:none !important; }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">CD</div>
+      <div>
+        <h1>CDMA Dashboard</h1>
+        <div class="small-muted">Chuk's data management toolkit</div>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <div class="search-input d-none d-md-flex">
+        <i class="fa fa-magnifying-glass" aria-hidden="true"></i>
+        <input placeholder="Search tools, tasks or events..." id="globalSearch" />
+      </div>
+
+      <div class="profile">
+        <div class="small-muted d-none d-md-block">Hello, <strong>Chuk</strong></div>
+        <img src="https://www.gravatar.com/avatar?d=mp" alt="Profile" />
+        <button class="theme-toggle" id="themeBtn" aria-label="Toggle theme">
+          <i id="themeIcon" class="fa fa-moon"></i>
+        </button>
+        <button class="btn-outline" id="sidebarToggle" title="Collapse sidebar"><i class="fa fa-bars"></i></button>
+      </div>
+    </div>
+  </header>
+
+  <div class="app">
+    <!-- Primary Sidebar -->
+    <aside class="sidebar" id="primarySidebar" aria-label="Primary sidebar">
+      <nav class="nav-primary" aria-label="Main navigation">
+        <button class="nav-btn active" onclick="switchPrimary('home')" id="nav-home"><i class="fa fa-house"></i><span class="nav-label"> Home</span></button>
+        <button class="nav-btn" id="toolsBtn" onmouseenter="revealSidebar('tools')" onclick="switchPrimary('tools')"><i class="fa fa-wrench"></i><span class="nav-label"> Tools</span></button>
+        <button class="nav-btn" id="dataBtn" onmouseenter="revealSidebar('data')" onclick="switchPrimary('data')"><i class="fa fa-database"></i><span class="nav-label"> Data Management</span></button>
+        <button class="nav-btn" id="aboutBtn" onmouseenter="revealSidebar('about')" onclick="switchPrimary('about')"><i class="fa fa-user"></i><span class="nav-label"> About</span></button>
+      </nav>
+
+      <div style="flex:1"></div>
+
+      <div class="small-muted" style="font-size:12px">Quick actions</div>
+      <div style="display:flex; gap:8px; margin-top:8px">
+        <button class="btn-modern" onclick="showSection('folder-reporting')"><i class="fa fa-folder-open"></i>&nbsp;Report</button>
+        <button class="btn-outline" onclick="showSection('json-csv')"><i class="fa fa-file-code"></i>&nbsp;Convert</button>
+      </div>
+    </aside>
+
+    <!-- Secondary Sidebar (submenu) -->
+    <aside class="secondary-sidebar" id="secondarySidebar" aria-label="Secondary sidebar">
+      <div id="secondaryLinks" style="display:flex;flex-direction:column;gap:8px"></div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main" id="mainContent">
+      <!-- Home Section (contains the tabs and cards) -->
+      <section id="home" class="active">
+        <div class="card-modern">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+            <div>
+              <h2>Welcome</h2>
+              <div class="small-muted">This is a dashboard of free data management tools for data stewards, analysts, and automation specialists.</div>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center">
+              <div class="small-muted">Server events: <strong id="evtCount">0</strong></div>
+              <button class="btn-outline" onclick="showSection('calendar')"><i class="fa fa-calendar-days"></i>&nbsp;Open Calendar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-modern">
+          <h2>My Dashboard</h2>
+
+          <!-- Tabs -->
+          <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link active" id="tasks-tab" data-toggle="tab" href="#tasks" role="tab">Upcoming Task</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="issues-tab" data-toggle="tab" href="#issues" role="tab">Issues Register</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="calendar-tab" data-toggle="tab" href="#calendar" role="tab">My-Calendar</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="achievements-tab" data-toggle="tab" href="#achievements" role="tab">Achievements</a>
+            </li>
+          </ul>
+
+          <div class="tab-content" id="dashboardTabsContent" style="margin-top:14px;">
+            <!-- Tasks -->
+            <div class="tab-pane fade show active" id="tasks" role="tabpanel">
+              <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                <form id="taskForm" class="form-inline mb-3" style="display:flex;gap:10px;flex:1;min-width:280px;">
+                  <input type="text" class="form-control mr-2" id="taskTitle" placeholder="Task Title" required />
+                  <select class="form-control mr-2" id="taskStatus">
+                    <option>Pending</option>
+                    <option>In Progress</option>
+                    <option>Completed</option>
+                  </select>
+                  <button type="submit" class="btn-modern">Add Task</button>
+                </form>
+                <!-- placeholder for filters -->
+                <div style="margin-left:auto; display:flex; gap:8px; align-items:center">
+                  <select id="taskFilter" class="btn-outline" onchange="filterTasks(event)">
+                    <option value="all">All</option>
+                    <option value="Pending">Pending</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                  </select>
+                </div>
+              </div>
+
+              <div id="taskList" style="margin-top:12px;">
+                {% for task in tasks %}
+                  <div class="task-card mb-2 card-modern">
+                    <div>
+                      <div style="font-weight:700">{{ task.title }}</div>
+                      <div class="meta">Status: <span class="badge-status">{{ task.status }}</span></div>
+                    </div>
+                    <div style="display:flex;gap:8px;align-items:center">
+                      <button class="btn-outline hide-task" data-id="{{ task.id }}">Hide</button>
+                      <button class="btn-outline" style="background:transparent;color:#e11d48;border-color: rgba(225,29,72,0.08);" class="delete-task" data-id="{{ task.id }}">Delete</button>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <!-- Issues -->
+            <div class="tab-pane fade" id="issues" role="tabpanel">
+              <h3 class="mt-3">Issues Tracker</h3>
+              <form id="issueForm" class="form-inline mb-3" style="display:flex;gap:10px;flex-wrap:wrap;">
+                <input type="text" class="form-control mr-2" id="issueDesc" placeholder="Issue Description" required />
+                <select class="form-control mr-2" id="issueStatus">
+                  <option>Open</option>
+                  <option>Resolved</option>
+                </select>
+                <button type="submit" class="btn-modern" style="background:#ef4444">Add Issue</button>
+              </form>
+
+              <ul class="list-group" id="issueList" style="margin-top:10px; border-radius:12px; overflow:hidden">
+                {% for issue in issues %}
+                  <li class="list-group-item d-flex justify-content-between align-items-center" style="display:flex;justify-content:space-between;align-items:center;">
+                    <div><strong>ID: {{ issue.id }}</strong> - <span class="small-muted">{{ issue.description }}</span></div>
+                    <div>
+                      <span class="badge badge-{{ 'danger' if issue.status == 'Open' else 'success' }} float-right">{{ issue.status }}</span>
+                      <button class="btn-outline hide-task" data-id="{{ task.id }}">Hide</button>
+                      <button class="btn-outline" style="margin-left:6px;color:#e11d48;border-color: rgba(225,29,72,0.08);" class="delete-task" data-id="{{ task.id }}">Delete</button>
+                    </div>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+
+            <!-- Calendar -->
+            <div class="tab-pane fade" id="calendar" role="tabpanel">
+              <h3 class="mt-3">My-Calendar</h3>
+              <form id="calendarForm" class="form-inline mb-3" style="display:flex;gap:10px;flex-wrap:wrap;">
+                <input type="datetime-local" class="form-control mr-2" id="eventDateTime" required />
+                <input type="text" class="form-control mr-2" id="eventDesc" placeholder="Event Description" required />
+                <button type="submit" class="btn-modern" style="background:#06b6d4">Add Event</button>
+              </form>
+
+              <div id="calendarView" style="width:100%; border-radius:10px; overflow:hidden; border:1px solid rgba(0,0,0,0.04);"></div>
+            </div>
+
+            <!-- Achievements -->
+            <div class="tab-pane fade" id="achievements" role="tabpanel">
+              <h3 class="mt-3">Achievements</h3>
+              <form id="achievementForm" class="mb-3 card-modern">
+                <div class="mb-2">
+                  <input type="text" class="form-control" id="achTask" placeholder="Task Name" required />
+                </div>
+                <div class="mb-2">
+                  <textarea class="form-control" id="achDesc" placeholder="Description" required></textarea>
+                </div>
+                <div class="mb-2">
+                  <input type="text" class="form-control" id="achProject" placeholder="Project Name" required />
+                </div>
+                <div class="mb-2">
+                  <input type="text" class="form-control" id="achManager" placeholder="Project Manager" required />
+                </div>
+                <div style="display:flex;gap:8px;">
+                  <input type="date" class="form-control" id="achStart" required />
+                  <input type="date" class="form-control" id="achEnd" required />
+                </div>
+                <div class="mb-2" style="margin-top:8px;">
+                  <select class="form-control" id="achStatus">
+                    <option>Completed</option>
+                    <option>In Progress</option>
+                    <option>Cancelled</option>
+                  </select>
+                </div>
+                <div class="mb-2">
+                  <textarea class="form-control" id="achComment" placeholder="Comment"></textarea>
+                </div>
+                <button type="submit" class="btn-modern">Submit Achievement</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- The rest of the tool sections are unchanged in content or IDs, but visually restyled via classes above. -->
+      <!-- Folder Reporting -->
+      <section id="folder-reporting" class="card-modern hidden">
+        <h2>📂 Folder Reporting</h2>
+        <form id="folderForm" enctype="multipart/form-data" style="display:flex;gap:10px;align-items:center;">
+          <input type="file" name="folder_zip" accept=".zip" required />
+          <button type="submit" class="btn-modern">Generate Report</button>
+        </form>
+        <div id="reportStatus" style="margin-top: 1em;" class="small-muted"></div>
+        <div id="reportTable" style="margin-top: 1em;"></div>
+      </section>
+
+      <!-- Text Counter -->
+      <section id="text-counter" class="card-modern hidden">
+        <h2>Text Counter</h2>
+        <textarea id="textInput" rows="6" oninput="countText()" style="width:100%;"></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <div id="wordCount" class="WordCount" style="background:transparent;padding:6px 10px;border-radius:8px;border:1px solid rgba(0,0,0,0.04)">Words: 0</div>
+          <div id="charCount" style="padding:6px 10px;border-radius:8px;border:1px solid rgba(0,0,0,0.04)">Characters: 0</div>
+        </div>
+      </section>
+
+      <!-- JSON to CSV -->
+      <section id="json-csv" class="card-modern hidden">
+        <h2>JSON to CSV Converter</h2>
+        <form id="uploadForm" enctype="multipart/form-data" style="display:flex;gap:10px;align-items:center;">
+          <input type="file" name="file" accept=".json" required />
+          <button type="submit" class="btn-modern">Convert & Download</button>
+        </form>
+        <p id="status" class="small-muted" style="margin-top:8px;"></p>
+      </section>
+
+      <!-- Path Generator -->
+      <section id="path-generator" class="card-modern hidden">
+        <h2>Path Generator</h2>
+        <div id="drop-zone">
+          <p>Drag & drop a folder here or use the picker below:</p>
+          <input type="file" id="folderInput" webkitdirectory directory multiple>
+          <br><br>
+          <button id="submitBtn" class="btn-modern">Generate</button>
+        </div>
+        <div id="results" style="margin-top:12px;"></div>
+        <br>
+        <button id="downloadBtn" class="btn-modern hidden">Download CSV</button>
+      </section>
+
+      <!-- Batch copy placeholder -->
+      <section id="batch-copy" class="card-modern hidden">
+        <h2>Batch Copy File</h2>
+        <p>Copies files from a spreadsheet with file paths to designated folders.</p>
+      </section>
+
+      <!-- Bounding box single -->
+      <section id="bbox-single" class="card-modern hidden">
+        <h2>Bounding Box Generator (Single Point)</h2>
+        <input type="text" id="coordinates" placeholder="Enter location">
+        <button onclick="submitCoordinates()" class="btn-modern">Generate</button>
+        <div id="map-container" style="margin-top: 20px;"></div>
+        <div id="bbox-list" class="bbox-container"></div>
+      </section>
+
+      <!-- Bounding box multi -->
+      <section id="bbox-multi" class="card-modern hidden">
+        <h2>Bounding Box Generator (Multiple Points)</h2>
+        <input type="text" id="multi-coordinates" placeholder="lat,lon;lat,lon;..." required />
+        <button onclick="submitMultipleCoordinates()" class="btn-modern">Generate</button>
+        <div id="multi-map-container" style="margin-top: 20px;"></div>
+        <div id="multi-bbox-list" class="bbox-container"></div>
+      </section>
+
+      <!-- Excel QA -->
+      <section id="excel-qa" class="card-modern hidden">
+        <h2>Excel QA Report Generator</h2>
+        <form id="excelForm" enctype="multipart/form-data" style="display:flex;gap:10px;align-items:center;">
+          <input type="file" name="excel_file" required />
+          <button type="submit" class="btn-modern">Generate Report</button>
+        </form>
+        <div id="report"></div>
+      </section>
+
+      <!-- Scientific calculator -->
+      <section id="leave-calc" class="card-modern hidden">
+        <h2>Scientific Calculator</h2>
+        <form id="calcForm" style="display:flex;gap:10px;align-items:center;">
+          <input type="text" id="expression" placeholder="Enter expression, e.g., sin(90)+log(100)" required />
+          <button type="submit" class="btn-modern">Calculate</button>
+        </form>
+        <p id="calcResult" class="small-muted" style="margin-top:8px"></p>
+      </section>
+
+      <!-- Data management sections -->
+      <section id="dm-planning" class="card-modern hidden">
+        <h2>📝 Data Management Planning</h2>
+        <p>A Data Management Plan (DMP) should include: data types, metadata standards, storage & backup procedures, data sharing policies, privacy & ethics considerations, and long-term preservation strategy.</p>
+        <ul>
+          <li>Types of data to be collected or created</li>
+          <li>Standards and metadata to be used</li>
+          <li>Policies for access and sharing</li>
+          <li>Plans for archiving and preservation</li>
+          <li>Data security and ethical/legal compliance</li>
+        </ul>
+      </section>
+
+      <section id="dm-quality" class="card-modern hidden">
+        <h2>📊 Data Quality Checking</h2>
+        <p>Use this checklist to ensure your data quality:</p>
+        <ul>
+          <li>Is the data in machine-readable format (CSV, JSON, etc.)?</li>
+          <li>Are there missing or null values?</li>
+          <li>Is data type consistent across columns?</li>
+          <li>Are date/time fields properly formatted?</li>
+          <li>Do categorical fields contain only allowed values?</li>
+          <li>Any duplicates present?</li>
+        </ul>
+      </section>
+
+      <section id="dm-metadata" class="card-modern hidden">
+        <h2>🏷️ Metadata Guidance</h2>
+        <form id="metadataForm">
+          <label>What is the dataset?</label><br>
+          <input type="text" id="metaWhat"><br>
+          <label>From where is it taken?</label><br>
+          <input type="text" id="metaSource"><br>
+          <label>What location was it captured?</label><br>
+          <input type="text" id="metaWhere"><br>
+          <label>What is the temporal extent?</label><br>
+          <input type="text" id="metaWhen"><br>
+          <br>
+          <button type="button" onclick="generateMetadataTitle()" class="btn-modern">Generate Metadata Title</button>
+        </form>
+        <h3 id="metaTitle" style="margin-top:20px; color:green;"></h3>
+        <h3 id="meta2Title" style="margin-top:20px; color:green;"></h3>
+      </section>
+
+      <section id="dm-practices" class="card-modern hidden">
+        <h2>🌟 Best Practices in Data Management</h2>
+        <ul>
+          <li>Use consistent naming conventions and folder structures</li>
+          <li>Always document metadata alongside datasets</li>
+          <li>Automate backups and version control (e.g., Git, DVC)</li>
+          <li>Encrypt sensitive data</li>
+          <li>Validate data formats and structure regularly</li>
+          <li>Ensure compliance with data policies and licenses</li>
+        </ul>
+      </section>
+
+      <section id="dm-clearmetadata" class="card-modern hidden">
+  <h2>CLEAR Metadata</h2>
+  <p>
+    The <strong>CLEAR Metadata</strong> is a framework that summarises the NERC metadata guidance 
+    for writing good titles and abstracts for discovery metadata.
+  </p>
+
+  <h4>C - clarity</h4> 
+  <li>Title/abstract should be understandable to a non-expert and a first-year student.</li>
+  <li>Avoid jargon, or explain acronyms and technical terms the first time they appear.</li>
+  <li>Must describe the dataset/resource itself, not just the project that produced it.</li>
+
+  <h4>L - length &amp; focus</h4>
+  <li><strong>Title: </strong>Keep short, brief and simple (ideally ≤ 60 characters, or ensure key info is in the first 60 characters).</li>
+  <li><strong>Abstract: </strong>At least 100 characters. The first 150 characters should summarise the key details (for search engines).</li>
+  <li>Both should be concise <strong>but informative.</strong></li>
+
+  <h4>E - essential Information (“What, Where, When, Who, How, Why”)</h4>
+  <li><strong>The title</strong> should include <i>What, Where, and When.</i></li>
+  <li><strong>The abstract</strong> should include <i>What, Where, When, How, Why, Who.</i></li>
+  <li>State spatial and temporal coverage when relevant.</li>
+
+  <h4>A - accuracy &amp; avoiding redundancy</h4>
+  <li>No repeated text (e.g., don’t copy the title into the abstract).</li>
+  <li>Acronyms are formatted as Full Term (ACRONYM) the first time.</li>
+  <li>Proper nouns capitalised; sentence case used otherwise.</li>
+  <li>Dataset description must be accurate and not misleading.</li>
+
+  <h4>R - readability and relevance</h4>
+  <li><strong>Title</strong> in sentence case, starting with an informative word.</li>
+  <li><strong>Abstract</strong> in plain English, full sentences (not fragments).</li>
+  <li>Avoid robotic or overly formal phrasing — write for humans.</li>
+  <li>Provide enough context so a reader can judge relevance.</li>
+
+  <h3>CLEAR Questionnaire</h3>
+  <ul>
+    <li>Is the title understandable to a non-expert and a first-year student?</li>
+    <li>Is the abstract free from unexplained jargon or acronyms?</li>
+    <li>Are all acronyms explained in full the first time they appear?</li>
+    <li>Do the title and abstract describe the dataset/resource itself, not just the project that produced it?</li>
+
+    <li>Is the title short, brief, and simple (ideally ≤ 60 characters, or with key information in the first 60)?</li>
+    <li>Is the abstract at least 100 characters long?</li>
+    <li>Do the first 150 characters of the abstract clearly summarise the dataset for search engine indexing?</li>
+    <li>Are both title and abstract concise but still informative?</li>
+
+    <li>Does the title include What, Where, and When?</li>
+    <li>Does the abstract include What, Where, When, How, Why, and Who?</li>
+    <li>Is spatial coverage stated (if relevant)?</li>
+    <li>Is temporal coverage stated (if relevant)?</li>
+
+    <li>Is the abstract different from the title (not copied/repeated)?</li>
+    <li>Are acronyms formatted correctly as Full Term (ACRONYM) the first time?</li>
+    <li>Are proper nouns capitalised appropriately, with sentence case used otherwise?</li>
+    <li>Is the dataset description accurate and not misleading?</li>
+    <li>Are there any visible errors/typos in the abstract that could mislead?</li>
+
+    <li>Does the title use sentence case and start with an informative word (not “A study of…”)?</li>
+    <li>Is the abstract written in plain English with full sentences?</li>
+    <li>Is the language natural and readable (not robotic or overly formal)?</li>
+    <li>Does the abstract provide enough context for a reader to judge the dataset’s relevance?</li>
+
+    <li>Is the metadata written in English?</li>
+    <li>Are the title and abstract different (not identical)?</li>
+    <li>If the dataset is part of a project, does the title include the project name in brackets at the start or end?</li>
+    <li>Does the abstract include any necessary caveats or limitations?</li>
+  </ul>
+</section>
+
+      <section id="my-cv" class="card-modern hidden">
+        <h2>My CV</h2>
+        <p>[Professional CV template will appear here.]</p>
+      </section>
+
+      <section id="cv-form" class="card-modern hidden">
+        <h2>CV Form</h2>
+        <form>
+          <input type="text" placeholder="Full Name" required />
+          <input type="email" placeholder="Email" required />
+          <textarea placeholder="Professional Summary"></textarea>
+          <button type="submit" class="btn-modern">Generate CV</button>
+        </form>
+      </section>
+
+      <footer class="footer">
+        <p>Contact: chuk.umunna@email.com | 
+           <a href="https://linkedin.com/in/chuk-umunna" style="color: var(--brand)">LinkedIn</a></p>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Inject Server Events as JSON -->
+  <script>
+    const serverEvents = {{ events | default([]) | tojson }};
+    document.getElementById('evtCount').innerText = (serverEvents && serverEvents.length) ? serverEvents.length : 0;
+  </script>
+
+  <!-- JS Dependencies -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+
+  <!-- Application JS (existing handlers preserved, improved small UX behaviors) -->
+  <script>
+    // Preserve existing secondary menu content and behavior
+    const secondaryMenu = {
+      tools: [
+        { id: 'folder-reporting', label: '📁 Folder Reporting' },
+        { id: 'text-counter', label: '🔤 Text Counter' },
+        { id: 'json-csv', label: '🔄 JSON to CSV' },
+        { id: 'path-generator', label: '🧭 Paths Generator' },
+        { id: 'batch-copy', label: '📄 Batch Copy' },
+        { id: 'bbox-single', label: '📌 BBox (Single)' },
+        { id: 'bbox-multi', label: '📍 BBox (Multiple)' },
+        { id: 'excel-qa', label: ' Excel QA' },
+        { id: 'leave-calc', label: ' Leave Calculator' }
+      ],
+      data: [
+        { id: 'dm-planning', label: ' DMP Planning' },
+        { id: 'dm-quality', label: ' Quality Check' },
+        { id: 'dm-metadata', label: ' Metadata' },
+        { id: 'dm-practices', label: ' Best Practices' },
+        { id: 'dm-clearmetadata', label: 'Clear Metadata'}
+      ],
+      about: [
+        { id: 'my-cv', label: ' My CV' },
+        { id: 'cv-form', label: ' CV Form' }
+      ]
+    };
+
+    // Utility: show/hide sections (keeps all existing IDs)
+    function showSection(id) {
+      document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
+      document.querySelectorAll("section").forEach(s => s.classList.add("hidden"));
+      const el = document.getElementById(id);
+      if (el) {
+        el.classList.remove("hidden");
+        el.classList.add("active");
+        // smooth scroll to top of main content
+        document.getElementById('mainContent').scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    // Setup secondary sidebar menu
+    function switchPrimary(group) {
+      const secondaryLinks = document.getElementById("secondaryLinks");
+      secondaryLinks.innerHTML = "";
+
+      if (secondaryMenu[group]) {
+        secondaryMenu[group].forEach(item => {
+          const btn = document.createElement("button");
+          btn.className = 'nav-btn';
+          btn.textContent = item.label;
+          btn.onclick = () => showSection(item.id);
+          secondaryLinks.appendChild(btn);
+        });
+        // automatically show first sub-item or home
+        if (secondaryMenu[group][0]) {
+          showSection(secondaryMenu[group][0].id);
+        }
+      } else if (group === "home") {
+        showSection("home");
+        secondaryLinks.innerHTML = "";
+      }
+      // highlight the primary nav
+      document.querySelectorAll('.nav-btn').forEach(nb => nb.classList.remove('active'));
+      const primaryBtn = document.getElementById('nav-' + group);
+      if (primaryBtn) primaryBtn.classList.add('active');
+    }
+
+    // reveal submenu on hover (existing behavior preserved)
+    function revealSidebar(group) {
+      const secondaryLinks = document.getElementById("secondaryLinks");
+      secondaryLinks.innerHTML = "";
+      if (secondaryMenu[group]) {
+        secondaryMenu[group].forEach(item => {
+          const btn = document.createElement("button");
+          btn.className = 'nav-btn';
+          btn.textContent = item.label;
+          btn.onclick = () => showSection(item.id);
+          secondaryLinks.appendChild(btn);
+        });
+      }
+      document.getElementById('secondarySidebar').style.display = "flex";
+    }
+
+    // Hide secondary sidebar when mouse leaves
+    document.addEventListener("DOMContentLoaded", () => {
+      switchPrimary("home");
+      const sidebar = document.getElementById('secondarySidebar');
+      const toolsBtn = document.getElementById('toolsBtn');
+      const aboutBtn = document.getElementById('aboutBtn');
+
+      [toolsBtn, aboutBtn, sidebar].forEach(el => {
+        el.addEventListener('mouseleave', () => {
+          setTimeout(() => {
+            if (!sidebar.matches(':hover') && !toolsBtn.matches(':hover') && !aboutBtn.matches(':hover')) {
+              sidebar.style.display = "none";
+            }
+          }, 300);
+        });
+      });
+    });
+
+    // Theme toggle with persistence
+    const themeBtn = document.getElementById('themeBtn');
+    const themeIcon = document.getElementById('themeIcon');
+    function applyTheme(t) {
+      document.documentElement.setAttribute('data-theme', t);
+      if (t === 'dark') themeIcon.className = 'fa fa-sun';
+      else themeIcon.className = 'fa fa-moon';
+    }
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+      localStorage.setItem('cdma_theme', next);
+    }
+    themeBtn.addEventListener('click', toggleTheme);
+    // load from storage
+    (function(){
+      const saved = localStorage.getItem('cdma_theme') || 'light';
+      applyTheme(saved);
+    })();
+
+    // Sidebar collapse
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const primarySidebar = document.getElementById('primarySidebar');
+    sidebarToggle.addEventListener('click', () => {
+      primarySidebar.classList.toggle('collapsed');
+      // hide labels when collapsed
+      document.querySelectorAll('#primarySidebar .nav-btn .nav-label').forEach(lb => {
+        lb.style.display = primarySidebar.classList.contains('collapsed') ? 'none' : 'inline';
+      });
+    });
+
+    // keep existing search functionality stub (no backend change)
+    document.getElementById('globalSearch').addEventListener('keypress', function(e){
+      if (e.key === 'Enter') {
+        const q = e.target.value.toLowerCase();
+        // basic client-side search over section headings and tool labels
+        const all = Array.from(document.querySelectorAll('section, h2, h3'));
+        const found = all.find(el => (el.innerText || '').toLowerCase().includes(q));
+        if (found) showSection(found.id || found.closest('section')?.id || 'home');
+      }
+    });
+
+    // Existing scripts kept below, with only minor UX additions (no endpoint changes)
+
+    // Task Form
+    document.getElementById("taskForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const title = document.getElementById("taskTitle").value;
+      const status = document.getElementById("taskStatus").value;
+
+      fetch('/add_task', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, status })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'success') {
+          const card = document.createElement("div");
+          card.className = "task-card mb-2 card-modern";
+          card.innerHTML = `
+            <div>
+              <div style="font-weight:700">${title}</div>
+              <div class="meta">Status: <span class="badge-status">${status}</span></div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <button class="btn-outline hide-task">Hide</button>
+              <button class="btn-outline" style="background:transparent;color:#e11d48;border-color: rgba(225,29,72,0.08);">Delete</button>
+            </div>`;
+          document.getElementById("taskList").appendChild(card);
+          document.getElementById("taskForm").reset();
+        } else {
+          alert("Failed to add task.");
+        }
+      });
+    });
+
+    // Issue Form
+    document.getElementById("issueForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const desc = document.getElementById("issueDesc").value;
+      const status = document.getElementById("issueStatus").value;
+      const badgeClass = status === "Open" ? "danger" : "success";
+
+      fetch('/add_issue', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description: desc, status })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'success') {
+          const item = document.createElement("li");
+          item.className = "list-group-item";
+          item.style.display = 'flex';
+          item.style.justifyContent = 'space-between';
+          item.innerHTML = `<div><strong>ID: ${data.issue.id}</strong> - ${desc}</div>
+            <div><span class="badge badge-${badgeClass} float-right">${status}</span></div>`;
+          document.getElementById("issueList").appendChild(item);
+          document.getElementById("issueForm").reset();
+        } else {
+          alert("Failed to add issue.");
+        }
+      });
+    });
+
+    // FullCalendar Setup
+    document.addEventListener('DOMContentLoaded', function () {
+      const calendarEl = document.getElementById('calendarView');
+      if (calendarEl) {
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: 'dayGridMonth',
+          headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+          },
+          events: serverEvents,
+        });
+        calendar.render();
+
+        // Add Event
+        document.getElementById("calendarForm").addEventListener("submit", function (e) {
+          e.preventDefault();
+          const date = document.getElementById("eventDateTime").value;
+          const desc = document.getElementById("eventDesc").value;
+
+          fetch('/add_event', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title: desc, start: date })
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.status === 'success') {
+              calendar.addEvent({
+                title: desc,
+                start: date,
+                allDay: false
+              });
+              document.getElementById("calendarForm").reset();
+            } else {
+              alert("Failed to add event.");
+            }
+          });
+        });
+      }
+    });
+
+    // Achievements
+    document.getElementById("achievementForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const data = {
+        task: document.getElementById("achTask").value,
+        description: document.getElementById("achDesc").value,
+        project: document.getElementById("achProject").value,
+        manager: document.getElementById("achManager").value,
+        date_started: document.getElementById("achStart").value,
+        date_ended: document.getElementById("achEnd").value,
+        status: document.getElementById("achStatus").value,
+        comment: document.getElementById("achComment").value
+      };
+
+      fetch('/add_achievement', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+      .then(res => res.json())
+      .then(response => {
+        if (response.status === 'success') {
+          alert("Achievement recorded.");
+          document.getElementById("achievementForm").reset();
+        } else {
+          alert("Failed to save achievement.");
+        }
+      });
+    });
+
+    // Folder Reporting
+    const folderUploadForm = document.getElementById('folderForm');
+    const reportTable = document.getElementById('reportTable');
+    const reportStatus = document.getElementById('reportStatus');
+
+    if (folderUploadForm) {
+      folderUploadForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(folderUploadForm);
+        reportStatus.textContent = 'Generating report...';
+        reportTable.innerHTML = '';
+
+        try {
+          const response = await fetch('/folder_report', {
+            method: 'POST',
+            body: formData
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            reportStatus.textContent = `Error: ${data.error}`;
+          } else {
+            reportStatus.textContent = '';
+            renderTable(data);
+          }
+        } catch (error) {
+          reportStatus.textContent = 'An unexpected error occurred.';
+        }
+      });
+    }
+
+    function renderTable(data) {
+      let html = '<table border="0" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%;">';
+      for (const key in data) {
+        html += '<tr>';
+        html += `<th style="text-align: left; background-color: rgba(0,0,0,0.03); width:220px">${key}</th>`;
+
+        const value = data[key];
+        if (Array.isArray(value)) {
+          html += `<td>${value.length > 0 ? '<ul style="margin:0;padding-left:18px;">' + value.map(item => `<li>${item}</li>`).join('') + '</ul>' : 'None'}</td>`;
+        } else if (typeof value === 'object' && value !== null) {
+          html += `<td><ul style="margin:0;padding-left:18px">${Object.entries(value).map(([k, v]) => `<li><strong>${k}:</strong> ${Array.isArray(v) ? v.join(', ') : v}</li>`).join('')}</ul></td>`;
+        } else {
+          html += `<td>${value}</td>`;
+        }
+
+        html += '</tr>';
+      }
+      html += '</table>';
+      reportTable.innerHTML = html;
+    }
+
+    // Text counter
+    function countText() {
+      const text = document.getElementById('textInput').value;
+      fetch('/count', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'text=' + encodeURIComponent(text)
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('wordCount').innerText = 'Words: ' + data.words;
+        document.getElementById('charCount').innerText = 'Characters: ' + data.characters;
+      })
+      .catch(() => {
+        // if server not reachable, fallback
+        const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+        document.getElementById('wordCount').innerText = 'Words: ' + words;
+        document.getElementById('charCount').innerText = 'Characters: ' + text.length;
+      });
+    }
+
+    // JSON to CSV conversion & download
+    const form = document.getElementById('uploadForm');
+    const status = document.getElementById('status');
+    if (form) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        status.textContent = "Converting...";
+
+        try {
+          const response = await fetch('/convert', {
+            method: 'POST',
+            body: formData,
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            status.textContent = `Error: ${errorData.error}`;
+            return;
+          }
+
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'converted.csv';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(url);
+          status.textContent = "Download complete.";
+        } catch (error) {
+          status.textContent = "Error during conversion.";
+        }
+      });
+    }
+
+    // Path generator drag & drop and upload
+    (function(){
+      let lastData = [];
+      const dropZone = document.getElementById("drop-zone");
+      const input = document.getElementById("folderInput");
+      const submitBtn = document.getElementById("submitBtn");
+      const downloadBtn = document.getElementById("downloadBtn");
+      const results = document.getElementById("results");
+
+      if (!dropZone) return;
+
+      dropZone.addEventListener("dragover", function (e) {
+        e.preventDefault();
+        dropZone.classList.add("dragover");
+      });
+
+      dropZone.addEventListener("dragleave", function () {
+        dropZone.classList.remove("dragover");
+      });
+
+      dropZone.addEventListener("drop", function (e) {
+        e.preventDefault();
+        dropZone.classList.remove("dragover");
+
+        const items = e.dataTransfer.items;
+        if (!items) return;
+
+        let files = [];
+        const traverseFileTree = (item, path = "") => {
+          if (item.isFile) {
+            item.file(file => {
+              file.fullPath = path + file.name;
+              files.push(file);
+            });
+          } else if (item.isDirectory) {
+            const dirReader = item.createReader();
+            dirReader.readEntries(entries => {
+              for (let entry of entries) {
+                traverseFileTree(entry, path + item.name + "/");
+              }
+            });
+          }
+        };
+
+        for (let i = 0; i < items.length; i++) {
+          const entry = items[i].webkitGetAsEntry();
+          if (entry) traverseFileTree(entry);
+        }
+
+        setTimeout(() => {
+          uploadFiles(files);
+        }, 1000);
+      });
+
+      submitBtn.addEventListener("click", function () {
+        const files = input.files;
+        if (!files.length) return alert("No files selected.");
+        uploadFiles(files);
+      });
+
+      function uploadFiles(files) {
+        const formData = new FormData();
+        for (let i = 0; i < files.length; i++) {
+          formData.append("files", files[i], files[i].webkitRelativePath || files[i].name);
+        }
+
+        fetch("/upload_folder", {
+          method: "POST",
+          body: formData
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.error) {
+              results.innerText = data.error;
+              downloadBtn.classList.add('hidden');
+            } else {
+              lastData = data;
+              displayTable(data);
+              downloadBtn.classList.remove('hidden');
+            }
+          });
+      }
+
+      function displayTable(data) {
+        results.innerHTML = "";
+
+        const table = document.createElement("table");
+        const thead = document.createElement("thead");
+        const headerRow = document.createElement("tr");
+
+        const headers = ["Name", "Path", "Type", "Extension"];
+        headers.forEach(header => {
+          const th = document.createElement("th");
+          th.textContent = header;
+          headerRow.appendChild(th);
+        });
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        const tbody = document.createElement("tbody");
+        data.forEach(row => {
+          const tr = document.createElement("tr");
+          headers.forEach(h => {
+            const td = document.createElement("td");
+            td.textContent = row[h] || "";
+            tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+
+        results.appendChild(table);
+      }
+
+      if (downloadBtn) {
+        downloadBtn.addEventListener("click", function () {
+          fetch("/download_csv", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(lastData)
+          })
+            .then(response => response.blob())
+            .then(blob => {
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = "folder_contents.csv";
+              document.body.appendChild(a);
+              a.click();
+              a.remove();
+            });
+        });
+      }
+    })();
+
+    // Bounding box single
+    function submitCoordinates() {
+      const coordinates = document.getElementById('coordinates').value;
+      fetch('/geobox', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ coordinates: coordinates })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.bounding_box) {
+          const bbox = data.bounding_box;
+          const bboxList = `
+            <div class="bbox-item west">West Limit: ${bbox.west}</div>
+            <div class="bbox-item east">East Limit: ${bbox.east}</div>
+            <div class="bbox-item south">South Limit: ${bbox.south}</div>
+            <div class="bbox-item north">North Limit: ${bbox.north}</div>
+          `;
+          document.getElementById('bbox-list').innerHTML = bboxList;
+        } else {
+          console.warn('Bounding box not returned in response.');
+        }
+        if (data.error) {
+            alert(data.error);
+        } else {
+            document.getElementById('map-container').innerHTML = data.map_html;
+        }
+      })
+      .catch(error => {
+          console.error('Error:', error);
+      });
+    }
+
+    // Bounding box multiple
+    function submitMultipleCoordinates() {
+      const coordinates = document.getElementById('multi-coordinates').value;
+      fetch('/geobox_multiple', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ coordinates: coordinates })
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.bounding_box) {
+              const bbox = data.bounding_box;
+              const bboxList = `
+                <div class="bbox-item west">West Limit: ${bbox.west}</div>
+                <div class="bbox-item east">East Limit: ${bbox.east}</div>
+                <div class="bbox-item south">South Limit: ${bbox.south}</div>
+                <div class="bbox-item north">North Limit: ${bbox.north}</div>
+              `;
+              document.getElementById('multi-bbox-list').innerHTML = bboxList;
+          } else {
+              console.warn('Bounding box not returned in response.');
+          }
+
+          if (data.error) {
+              alert(data.error);
+          } else {
+              document.getElementById('multi-map-container').innerHTML = data.map_html;
+          }
+      })
+      .catch(error => {
+          console.error('Error:', error);
+      });
+    }
+
+    // Excel QA
+    document.getElementById("excelForm")?.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      fetch("/Excel_reporting", {
+        method: "POST",
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => displayReport(data))
+      .catch(error => {
+        document.getElementById("report").innerHTML = "Error generating report.";
+        console.error(error);
+      });
+    });
+
+    function displayReport(reportData) {
+      const container = document.getElementById("report");
+      container.innerHTML = "";
+
+      reportData.forEach(section => {
+        const sectionTitle = document.createElement("h3");
+        sectionTitle.textContent = section.section;
+        container.appendChild(sectionTitle);
+
+        const table = document.createElement("table");
+        const tbody = document.createElement("tbody");
+
+        for (const [key, value] of Object.entries(section.details)) {
+          const row = document.createElement("tr");
+          const cellKey = document.createElement("th");
+          const cellVal = document.createElement("td");
+
+          cellKey.textContent = key;
+          cellVal.innerHTML = Array.isArray(value) ? value.join(", ") : value;
+
+          row.appendChild(cellKey);
+          row.appendChild(cellVal);
+          tbody.appendChild(row);
+        }
+
+        table.appendChild(tbody);
+        container.appendChild(table);
+      });
+    }
+
+    // Calculator
+    document.getElementById("calcForm")?.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const expr = document.getElementById("expression").value;
+
+      fetch("/calculate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ expression: expr })
+      })
+      .then(res => res.json())
+      .then(data => {
+        const resultElem = document.getElementById("calcResult");
+        if (data.result !== undefined) {
+          resultElem.textContent = `Result: ${data.result}`;
+        } else {
+          resultElem.textContent = data.error || "An error occurred";
+        }
+      });
+    });
+
+    // Metadata title generation (unchanged)
+    function generateMetadataTitle() {
+      const what = document.getElementById("metaWhat").value;
+      const source = document.getElementById("metaSource").value;
+      const where = document.getElementById("metaWhere").value;
+      const when = document.getElementById("metaWhen").value;
+
+      const title = `${what} data from ${source} in ${where} (${when}).`;
+      document.getElementById("metaTitle").innerText = title;
+
+      const title2 = `${what} data from ${source}, ${where} (${when}).`;
+      document.getElementById("meta2Title").innerText = title2;
+    }
+
+    // Task filter helper (simple client-side)
+    function filterTasks(e) {
+      const val = e.target.value;
+      const items = document.querySelectorAll('#taskList .task-card');
+      items.forEach(it => {
+        if (val === 'all') it.style.display = 'flex';
+        else {
+          if ((it.innerText || '').includes(val)) it.style.display = 'flex';
+          else it.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block title %}Portfolio | Chuk Umunna{% endblock %}
+
+{% block content %}
+
+<!-- Modern, clean Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #f8fafc;
+  }
+
+  .portfolio-container {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 20px;
+  }
+
+  h2 {
+    font-size: 34px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 18px;
+  }
+
+  p.subtitle {
+    font-size: 17px;
+    color: #475569;
+    margin-bottom: 28px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+  }
+
+  .portfolio-card {
+    background: white;
+    padding: 22px;
+    border-radius: 14px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .portfolio-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+  }
+
+  .portfolio-card h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: #1e293b;
+  }
+
+  .portfolio-card p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #334155;
+  }
+
+  .btn {
+    display: inline-block;
+    background: #0A66C2;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    text-decoration: none;
+    margin-top: 30px;
+    transition: background 0.25s ease, transform 0.2s ease;
+  }
+
+  .btn:hover {
+    background: #004a86;
+    transform: translateY(-2px);
+  }
+</style>
+
+
+<div class="portfolio-container">
+
+  <h2>Portfolio</h2>
+  <p class="subtitle">Selected highlights of my data stewardship, governance, and metadata quality initiatives:</p>
+
+  <!-- Portfolio Grid -->
+  <div class="grid">
+
+    <!-- Grants & DMPs -->
+    <div class="portfolio-card">
+      <h3>📄 Grant Data Stewardship</h3>
+      <p>
+        Successfully managed multiple research grants, working with Principal Investigators to
+        generate and maintain <strong>35 Data Management Plans (DMPs)</strong>.
+      </p>
+    </div>
+
+    <!-- Dataset Verification -->
+    <div class="portfolio-card">
+      <h3>✅ Dataset Verification</h3>
+      <p>
+        Verified <strong>25 datasets</strong> to ensure accuracy, completeness, and alignment
+        with FAIR and TRUST principles.
+      </p>
+    </div>
+
+    <!-- DMP Questionnaire -->
+    <div class="portfolio-card">
+      <h3>📝 Digital DMP Questionnaire</h3>
+      <p>
+        Developed a collaborative DMP quality assessment questionnaire using
+        Data Steward Wizard, enabling project teams to maintain and update
+        DMPs throughout their research lifecycle.
+      </p>
+    </div>
+
+    <!-- CLEAR Metadata -->
+    <div class="portfolio-card">
+      <h3>📚 CLEAR Metadata Framework</h3>
+      <p>
+        Created <strong>CLEAR Metadata</strong>, a flexible metadata guidance framework
+        aligned with global standards, offering researchers clear steps for
+        producing high-quality metadata.
+        <br>
+        <a href="{{ url_for('clear') }}" class="btn">CLEAR Metadata</a>
+      </p>
+    </div>
+
+    <!-- CDMA Toolkit -->
+    <div class="portfolio-card">
+      <h3>🧰 CDMA Data Toolkit</h3>
+      <p>
+        Built the <strong>CDMA Toolkit</strong>, a set of lightweight, easy-to-use tools
+        designed to support daily data management and stewardship workflows.
+      </p>
+    </div>
+
+    <!-- Metadata QA Tool -->
+    <div class="portfolio-card">
+      <h3>🔍 Metadata QA Tool</h3>
+      <p>
+        Automated ISO 19115 metadata completeness checks, allowing users to quickly
+        identify missing fields and quality gaps.
+      </p>
+    </div>
+
+    <!-- FAIR Dashboard -->
+    <div class="portfolio-card">
+      <h3>📊 FAIR Data Dashboard</h3>
+      <p>
+        Developed a Streamlit dashboard for visualising data maturity assessment
+        using synthetic datasets, supporting governance and improvement planning.
+      </p>
+    </div>
+
+    <!-- Geospatial Toolkit -->
+    <div class="portfolio-card">
+      <h3>🗺️ Geospatial Toolkit</h3>
+      <p>
+        Built an interactive interface for creating bounding boxes and validating
+        spatial metadata, helping standardise geospatial workflows.
+      </p>
+    </div>
+
+  </div>
+
+  <br>
+
+  <!-- CDMA Toolkit Button -->
+  <a href="{{ url_for('toolkit') }}" class="btn">Open CDMA Toolkit</a>
+
+</div>
+
+{% endblock %}

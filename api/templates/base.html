@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Chuk Umunna | Data Steward{% endblock %}</title>
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    /* =========================================================
+       THEME VARIABLES
+    ========================================================== */
+    :root {
+      --bg: #f6f8fa;
+      --panel: #ffffff;
+      --muted: #6b7280;
+      --brand: #0f766e;
+      --brand-dark: #064e45;
+      --accent: #06b6d4;
+      --text: #0b1a1e;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    body {
+      margin: 0;
+      font-family: "Inter", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* =========================================================
+       TOP NAVIGATION
+    ========================================================== */
+    header {
+      width: 100%;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 28px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--brand), var(--accent));
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-weight: 800;
+      font-size: 1rem;
+      box-shadow: var(--shadow);
+    }
+
+    .brand-text h1 {
+      font-size: 1.1rem;
+      margin: 0;
+      color: var(--brand-dark);
+    }
+
+    .brand-text .role {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    nav {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: var(--brand-dark);
+      font-weight: 600;
+      transition: 0.2s;
+    }
+
+    nav a:hover {
+      color: var(--accent);
+    }
+
+    /* Mobile Button */
+    .menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    /* =========================================================
+       MOBILE NAVIGATION MENU
+    ========================================================== */
+    #mobileMenu {
+      display: none;
+      flex-direction: column;
+      background: var(--panel);
+      width: 100%;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    #mobileMenu a {
+      padding: 10px 0;
+      font-weight: 600;
+    }
+
+    /* =========================================================
+       PAGE CONTENT
+    ========================================================== */
+    .content-area {
+      max-width: 900px;
+      margin: 40px auto;
+      background: var(--panel);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      width: 90%;
+    }
+
+    .page-title {
+      font-size: 1.7rem;
+      color: var(--brand);
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      display: inline-block;
+      margin-top: 20px;
+      background: linear-gradient(90deg, var(--brand), var(--accent));
+      color: white;
+      padding: 12px 22px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+      box-shadow: var(--shadow);
+    }
+
+    h1, h2 {
+      color: var(--brand-dark);
+      margin-bottom: 12px;
+    }
+
+    ul {
+      text-align: left;
+      margin: 0 auto;
+      max-width: 600px;
+    }
+
+    ul li {
+      margin: 8px 0;
+    }
+
+    /* =========================================================
+       FOOTER
+    ========================================================== */
+    .footer {
+      text-align: center;
+      padding: 20px 10px;
+      width: 100%;
+      margin-top: auto;
+      background: var(--panel);
+      border-top: 1px solid rgba(0,0,0,0.05);
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .footer a {
+      color: var(--brand);
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================== */
+    @media (max-width: 900px) {
+      nav {
+        display: none;
+      }
+      .menu-btn {
+        display: block;
+      }
+    }
+    /* =========================================================
+   LINKEDIN-STYLE PROFILE CARD
+========================================================== */
+.profile-card {
+  width: 90%;
+  max-width: 900px;
+  margin: 40px auto 0 auto;
+  background: var(--panel);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Top Banner (background image) */
+.profile-banner {
+  height: 180px;
+  background: url("{{ url_for('static', filename='background.jpg') }}") center/cover no-repeat;
+}
+
+/* Profile Photo — overlapping circle */
+.profile-photo {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 5px solid var(--panel);
+  position: absolute;
+  top: 110px;
+  left: 50%;
+  transform: translateX(-50%);
+  object-fit: cover;
+  box-shadow: var(--shadow);
+}
+
+.profile-info {
+  padding: 100px 20px 30px 20px;
+  text-align: center;
+}
+
+.profile-name {
+  font-size: 1.8rem;
+  color: var(--brand-dark);
+  margin-bottom: 5px;
+}
+
+.profile-title {
+  font-size: 1rem;
+  color: var(--muted);
+}
+
+.profile-meta {
+  margin-top: 15px;
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  flex-wrap: wrap;
+  color: var(--brand);
+  font-weight: 600;
+}
+
+.profile-meta i {
+  margin-right: 6px;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .profile-photo {
+    width: 110px;
+    height: 110px;
+    top: 120px;
+  }
+
+  .profile-name {
+    font-size: 1.5rem;
+  }
+}
+
+/* =========================================================
+   LINKEDIN-STYLE PROFILE CARD
+========================================================== */
+.profile-card {
+  width: 90%;
+  max-width: 900px;
+  margin: 40px auto 0 auto;
+  background: var(--panel);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  position: relative;
+  animation: fadeIn 0.8s ease;
+}
+
+/* Top Banner (your Big Data image) */
+.profile-banner {
+  height: 200px;
+  background: url("{{ url_for('static', filename='bigdata-banner.jpg') }}") center/cover no-repeat;
+  filter: brightness(0.9);
+}
+
+/* Profile Photo — overlapping circle */
+.profile-photo {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 5px solid var(--panel);
+  position: absolute;
+  top: 140px;
+  left: 50%;
+  transform: translateX(-50%);
+  object-fit: cover;
+  box-shadow: var(--shadow);
+  background: white;
+}
+
+.profile-info {
+  padding: 120px 20px 35px 20px;
+  text-align: center;
+}
+
+.profile-name {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--brand-dark);
+  margin-bottom: 4px;
+}
+
+.profile-title {
+  font-size: 1.05rem;
+  color: var(--muted);
+  margin-bottom: 18px;
+}
+
+.profile-meta {
+  margin-top: 10px;
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  flex-wrap: wrap;
+  color: var(--brand);
+  font-weight: 600;
+}
+
+.profile-meta i {
+  margin-right: 6px;
+}
+
+/* Social Icons */
+.profile-social {
+  margin-top: 18px;
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+}
+
+.profile-social a {
+  font-size: 1.3rem;
+  color: var(--brand-dark);
+  transition: 0.2s ease;
+}
+
+.profile-social a:hover {
+  color: var(--accent);
+  transform: translateY(-3px);
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .profile-photo {
+    width: 110px;
+    height: 110px;
+    top: 150px;
+  }
+
+  .profile-name {
+    font-size: 1.5rem;
+  }
+}
+/* =========================================================
+   PROFILE SECTION (NO CARD)
+========================================================== */
+.profile-section {
+  width: 100%;
+  margin: 0;
+  background: var(--panel);
+  text-align: center;
+  padding-bottom: 40px;
+}
+
+/* Banner */
+.profile-banner {
+  width: 100%;
+  height: 230px;
+  background: url("{{ url_for('static', filename='bigdata-banner.jpg') }}") center/cover no-repeat;
+}
+
+/* Profile photo */
+.profile-photo {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 5px solid var(--panel);
+  margin-top: 75px;
+  object-fit: cover;
+  box-shadow: var(--shadow);
+}
+
+/* Profile info */
+.profile-info {
+  padding: 20px;
+  margin-top: 50px;
+}
+
+.profile-name {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.profile-title {
+  font-size: 1rem;
+  color: var(--muted);
+  margin-top: 5px;
+}
+
+.profile-meta {
+  margin-top: 15px;
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+  font-weight: 600;
+  color: var(--brand);
+}
+
+/* ------------------------------------------
+   MAIN CONTENT (NO CARD)
+------------------------------------------- */
+.content-section {
+  width: 100%;
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.page-title {
+  font-size: 1.8rem;
+  color: var(--brand);
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+/* ------------------------------------------
+   RESPONSIVE
+------------------------------------------- */
+@media (max-width: 600px) {
+  .profile-photo {
+    width: 120px;
+    height: 120px;
+    margin-top: -60px;
+  }
+  
+  .profile-name {
+    font-size: 1.5rem;
+  }
+}
+
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER NAVIGATION -->
+  <header>
+    <div class="brand">
+      <div class="logo">Chuk</div>
+      <div class="brand-text">
+        <h1>Chukwuemeka Umunna</h1>
+        <div class="role">Data Steward • Metadata Specialist • Geoscience Data Management</div>
+      </div>
+    </div>
+
+    <!-- Desktop Navigation -->
+    <nav>
+      <a href="{{ url_for('home') }}">Home</a>
+      <a href="{{ url_for('about') }}">About</a>
+      <a href="{{ url_for('portfolio') }}">Portfolio</a>
+      <a href="{{ url_for('blog') }}">Blog</a>
+      <a href="{{ url_for('skills') }}">Skills</a>
+      <a href="{{ url_for('toolkit') }}">Toolkit</a>
+    </nav>
+
+    <!-- Mobile menu toggle -->
+    <button id="menuToggle" class="menu-btn">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+  </header>
+
+  <!-- Mobile Navigation Menu -->
+  <div id="mobileMenu">
+    <a href="{{ url_for('home') }}">Home</a>
+    <a href="{{ url_for('about') }}">About</a>
+    <a href="{{ url_for('portfolio') }}">Portfolio</a>
+    <a href="{{ url_for('blog') }}">Blog</a>
+    <a href="{{ url_for('skills') }}">Skills</a>
+    <a href="{{ url_for('toolkit') }}">Toolkit</a>
+  </div>
+
+<!-- PROFILE SECTION -->
+<section class="profile-section">
+  <div class="profile-banner"></div>
+
+  <img src="{{ url_for('static', filename='profile.jpg') }}" class="profile-photo" alt="Profile Photo">
+
+  <div class="profile-info">
+    <h2 class="profile-name">Chukwuemeka Umunna</h2>
+    <p class="profile-title">Data Steward • Metadata Specialist • Geoscience Data Management</p>
+
+    <div class="profile-meta">
+      <span><i class="fa-solid fa-location-dot"></i> United Kingdom</span>
+      <span><i class="fa-solid fa-briefcase"></i> Available for Consulting</span>
+      <span><i class="fa-solid fa-user-check"></i> Open to Job Opportunities</span>
+    </div>
+  </div>
+</section>
+
+
+  <!-- PAGE CONTENT -->
+<main class="content-section">
+  <h1 class="page-title">{% block page_title %}{% endblock %}</h1>
+
+  {% block content %}{% endblock %}
+</main>
+
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>© 2025 Chuk Umunna •
+      <a href="mailto:chukwuemekaumunna@gmail.com">Email</a> •
+      <a href="https://linkedin.com/in/chuk-umunna" target="_blank">LinkedIn</a>
+    </p>
+  </footer>
+
+  <!-- MOBILE MENU SCRIPT -->
+  <script>
+    const toggle = document.getElementById("menuToggle");
+    const mobileMenu = document.getElementById("mobileMenu");
+
+    toggle.addEventListener("click", () => {
+      mobileMenu.style.display = mobileMenu.style.display === "flex" ? "none" : "flex";
+    });
+  </script>
+
+</body>
+</html>

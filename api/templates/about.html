@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}About | Chuk Umunna{% endblock %}
+
+{% block content %}
+
+<!-- Beautiful Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #f8fafc; 
+    color: #2b2b2b;
+  }
+
+  .card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 30px;
+    max-width: 850px;
+    margin: 40px auto;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 26px rgba(0,0,0,0.08);
+  }
+
+  h2 {
+    font-size: 32px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #1e293b;
+  }
+
+  p {
+    line-height: 1.7;
+    font-size: 16px;
+    margin-bottom: 18px;
+  }
+
+  .profile-img {
+    width: 140px;
+    border-radius: 12px;
+    margin-top: 25px;
+    transition: transform 0.3s ease;
+  }
+
+  .profile-img:hover {
+    transform: scale(1.03);
+  }
+
+  .linkedin-btn {
+    display: inline-block;
+    background: #0A66C2;
+    color: #fff;
+    padding: 10px 18px;
+    margin-top: 10px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 0.3s ease, transform 0.2s ease;
+  }
+
+  .linkedin-btn:hover {
+    background: #004a86;
+    transform: translateY(-2px);
+  }
+
+</style>
+
+
+<div class="card">
+  <h2>About Me</h2>
+
+  <p>
+    Hello, I’m <strong>Chukwuemeka Umunna</strong> — though most people call me <strong>Chuk</strong>. I’m an early-career 
+    <strong>Data Steward</strong> based in the United Kingdom, with a background in <strong>Applied Geology (BTech)</strong> 
+    and a <strong>Master’s degree in GIS</strong>. I’m passionate about supporting a world where data is not only available 
+    but also trustworthy, accessible, and ready to support meaningful insights.
+  </p>
+
+  <p>
+    My journey into data stewardship began when I noticed how valuable research, especially in the geosciences, was often 
+    held back by inconsistent or inaccessible data. That experience shaped my dedication to data governance, metadata quality, 
+    and the principles of <strong>FAIR</strong> and <strong>TRUST</strong> data. Today, I focus on strengthening data maturity, improve governance, and build systems that allow people to use data with confidence.
+  </p>
+
+  <p>
+    I would describe myself as disciplined, determined, and hard-working. These qualities guided me through my academic journey 
+    and continue to fuel my growth as a professional. I enjoy contributing to projects that create long-term improvements in 
+    data quality. I’m constantly expanding my skill set across areas such as data management planning, data privacy, database 
+    management, quality assessment, analytics, and programming.
+  </p>
+
+  <p>
+    Outside my professional world, I find joy in cooking, especially experimenting with dishes I’ve never made before. Cooking 
+    mirrors the qualities needed in good data stewardship: creativity, patience, and close attention to detail. It’s also where 
+    I reset my mind, spark fresh ideas, and recharge my problem-solving energy.
+  </p>
+
+  <p>
+    I’m naturally curious and resourceful. Once, during a geological field exploration, I got lost in rugged terrain after my map 
+    was destroyed and all my devices stopped working. I relied solely on my <strong>geological intuition</strong> to navigate my 
+    way out, an experience that strengthened my calmness, resilience, and analytical thinking. Those qualities still guide me 
+    today.
+  </p>
+
+  <p>
+    My goal is simple: to make data easier to trust, easier to use, and easier to understand. If my work helps researchers, analysts, 
+    and decision-makers focus more on innovation and less on data issues, then I’ve made a meaningful contribution.
+  </p>
+
+  <p>
+    I’d love to connect, collaborate, or share ideas with you.  
+  </p>
+
+  <a href="https://www.linkedin.com/in/chuk-umunna" target="_blank" class="linkedin-btn">
+    Connect on LinkedIn
+  </a>
+
+</div>
+
+{% endblock %}
